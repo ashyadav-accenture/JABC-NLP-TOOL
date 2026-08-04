@@ -22,7 +22,15 @@ Raw Interview Workbooks (.xlsx)
        (Established Supporters / Potential Adopters)
     -> Confidence & uncertainty scoring
     -> Brand Health Matrix + evidence exports
+    -> Optional charts: score heatmap, factor circumplex, opportunity
+       priority quadrant, per-chart evidence workbooks, editable .pptx deck
 ```
+
+The charts also draw on two **human-coded** tables that live in config rather
+than being derived from the transcripts — the motivator/barrier frequencies in
+`motivators_barriers.yaml` and the opportunity themes in `opportunities.yaml`.
+Each chart section below says which of its numbers are measured by this
+pipeline and which are authored.
 
 Every number in the output can be traced back to the specific interview
 answer(s) that produced it via `respondent_theme_evidence.csv`.
@@ -31,16 +39,19 @@ answer(s) that produced it via `respondent_theme_evidence.csv`.
 
 ```bash
 cd jabc_brand_health_analyzer
-pip install pandas openpyxl pyyaml vaderSentiment matplotlib
+pip install pandas openpyxl pyyaml vaderSentiment matplotlib python-pptx
 ```
 
-(`matplotlib` is only needed if you use `--generate_heatmap true`.)
+Only `pandas`, `openpyxl` and `pyyaml` are hard requirements. The rest degrade
+gracefully: without `vaderSentiment` the sentiment component is skipped, without
+`matplotlib` the PNG charts are skipped, and without `python-pptx` the slide deck
+is skipped — in each case the run still completes and logs a warning.
 
 ## Usage
 
 ```bash
 python3 jabc_brand_health_analyzer.py \
-    --input_dir /Users/asheeshyadav/Desktop/Accenture/Excel-Docs \
+    --input_dir ./interviews \
     --output_dir ./outputs \
     --generate_heatmap true
 ```
@@ -52,28 +63,60 @@ python3 jabc_brand_health_analyzer.py \
 | `--input_dir` | *(required)* | Directory of `.xlsx` interview files |
 | `--output_dir` | *(required)* | Where outputs are written |
 | `--config_dir` | `./config` | YAML configuration directory |
-| `--generate_heatmap` | `false` | Also write `brand_health_matrix_heatmap.png` |
+| `--generate_heatmap` | `false` | Also write `brand_health_matrix_heatmap.png` + `brand_health_score_scale.png` |
+| `--generate_circumplex` | `false` | Also write `factor_circumplex.png` + its positions sidecar |
+| `--generate_priority_matrix` | `false` | Also write `opportunity_priority_matrix.png` + `opportunity_validation.csv` |
+| `--generate_reports` | `false` | Also write the two per-chart evidence workbooks |
+| `--generate_deck` | `false` | Also write `jabc_charts.pptx` (every chart as editable shapes) |
 | `--include_reference_sheets` | `false` | Score reference-only sheets too (not recommended) |
 | `--manual_review_threshold` | from config | Override the persona classification margin threshold |
 | `--calibration_csv` | *(none)* | Run the calibration workflow against a human-reviewed CSV |
 
+All the `--generate_*` flags take `true|false` and are independent of one
+another; the core tables below are written on every run.
+
 ### Try it on the included synthetic sample data
+
+Six synthetic interview workbooks ship in `sample_data/`. To produce every
+output at once:
 
 ```bash
 python sample_data/generate_sample_data.py   # regenerate if needed
-python jabc_brand_health_analyzer.py --input_dir ./sample_data --output_dir ./outputs --generate_heatmap true
+python jabc_brand_health_analyzer.py \
+    --input_dir ./sample_data --output_dir ./outputs \
+    --generate_heatmap true --generate_circumplex true \
+    --generate_priority_matrix true --generate_reports true --generate_deck true
 ```
+
+`outputs/` in this repo holds a checked-in run of exactly that command, so you
+can see what each file looks like without running anything.
 
 ## Outputs
 
+Written on every run:
+
 | File | Contents |
 |---|---|
-| `brand_health_matrix.csv` / `.xlsx` | **Primary output.** Average theme scores per Brand Persona, with conditional formatting (green ≥4.0, yellow 2.5-3.9, red <2.5) in the `.xlsx` version. Both reported personas always appear, even with zero respondents. |
-| `respondent_brand_health_scores.csv` / `.xlsx` | One row per respondent: theme scores, evidence status, behavioral flags, both the reported and the classification persona, confidence, manual-review flag/reason. |
+| `brand_health_matrix.csv` / `.xlsx` | **Primary output.** Average theme scores per Brand Persona. The `.xlsx` renders each score as a colour-coded face on the six-band scale described below, and carries a second "Persona Members" sheet. Both reported personas always appear, even with zero respondents. |
+| `respondent_brand_health_scores.csv` / `.xlsx` | One row per respondent: theme scores, evidence status, behavioral flags, both the reported and the classification persona, engagement evidence, confidence, manual-review flag/reason. |
 | `respondent_theme_evidence.csv` / `.xlsx` | One row per piece of evidence extracted (phrase/keyword match, explicit rating, etc.) — the audit trail behind every score. |
+| `persona_roster.csv` | Which respondents fall into which persona, standalone (same content as the `.xlsx` "Persona Members" sheet). |
 | `persona_validation.csv` | Diagnostic-only comparison of the predicted persona against the original interview-sheet label (never fed back into scoring). |
-| `brand_health_matrix_heatmap.png` | Optional visual heatmap of the matrix. |
-| `calibration_report.csv` / `.xlsx` | Only produced with `--calibration_csv`; compares automated scores/personas to a human reviewer's. |
+
+Written only when the matching flag is passed:
+
+| File | Flag | Contents |
+|---|---|---|
+| `brand_health_matrix_heatmap.png` | `--generate_heatmap` | Visual heatmap of the matrix. |
+| `brand_health_score_scale.png` | `--generate_heatmap` | The face-scale key, as its own fixed image. |
+| `factor_circumplex.png` | `--generate_circumplex` | Top-five motivators and barriers on the circumplex. |
+| `factor_circumplex_positions.csv` | `--generate_circumplex` | Sidecar: which of each circle's numbers were authored and which measured. |
+| `opportunity_priority_matrix.png` | `--generate_priority_matrix` | The seven opportunity themes on a Value × Difficulty quadrant. |
+| `opportunity_validation.csv` | `--generate_priority_matrix` | Sidecar: coded counts, authored difficulty, and the roster check. |
+| `circumplex_evidence_report.xlsx` | `--generate_reports` | Motivator/barrier frequencies with the interviews behind them. |
+| `opportunity_evidence_report.xlsx` | `--generate_reports` | Opportunity mentions with the coded roster behind them. |
+| `jabc_charts.pptx` | `--generate_deck` | Five slides, every chart redrawn as editable PowerPoint shapes. |
+| `calibration_report.csv` / `.xlsx` | `--calibration_csv` | Compares automated scores/personas to a human reviewer's. |
 
 ## How scoring works
 
@@ -218,15 +261,19 @@ indistinguishable from a measured one.
 
 Two notes on reading it:
 
-- **Four coded items are not plotted** — Flexibility (M5, 7), Free access
-  (M7, 5), Unclear fit (B2, 9) and Low awareness (B6, 7). They do not appear in
-  the approved diagram. Add them to `circumplex_layout.items` with an `x` to
-  bring them in.
-- **B3 and B4 overlap**, unavoidably: they tie on frequency (8) so they share a
-  vertical position, and the diagram places them close horizontally. Since both
-  axes are fixed, the circles cannot be nudged apart, so all fills are drawn
-  before any ring — every ring stays fully visible however much the discs
-  overlap.
+- **Three coded items are not plotted** — Flexibility (M6, 7), Free access
+  (M7, 5) and Presenter/delivery quality risk (B6, 8). They do not appear in
+  the approved diagram, but stay in the config: they are still part of the
+  analysis and the evidence workbook. Add them to `circumplex_layout.items`
+  with an `x` to bring them in. The ten that *are* plotted carry contiguous
+  codes M1–M5 / B1–B5, so no reader has to wonder what happened to a missing
+  number.
+- **The layout has to be collision-free as authored.** Both axes are fixed —
+  `x` is transcribed, `y` is the coded frequency — so a circle cannot be
+  nudged out of a collision at draw time, and two overlapping discs would hide
+  the family rings. `test_circumplex_circles_do_not_overlap` asserts that every
+  pair of circles clears the others and that none spills outside the outer ring,
+  so re-authoring an `x` fails the suite rather than quietly degrading the chart.
 
 ### Editable slide deck
 
@@ -395,8 +442,10 @@ Everything content-specific lives in `config/*.yaml`, not in code:
 - `persona_rules.yaml` — engagement gates, definitions, and typical score ranges per persona
 - `engagement_rules.yaml` — interview-section geometry, anchor questions, and the
   cue lexicons behind JABC recency/lapse and external-programming disposition
-- `motivators_barriers.yaml` — the coded motivator/barrier tables plus the cues
-  used to place them on the circumplex
+- `motivators_barriers.yaml` — the coded motivator/barrier tables, the cue
+  lexicons behind their persona attribution, and the authored `circumplex_layout`
+- `opportunities.yaml` — the seven coded opportunity themes, their rosters, and
+  the authored difficulty scale behind the priority matrix
 - `scoring_weights.yaml` — the formula weights described above
 - `sentiment_weights.yaml` — how much sentiment may influence each theme
 
@@ -457,10 +506,14 @@ pip install pytest
 pytest tests/ -v
 ```
 
-28 tests cover phrase/negation/intensifier matching, explicit rating
-parsing, sheet classification, identity resolution, scoring bounds and
-"unknown ≠ negative" behavior, persona classification, and an end-to-end
-run against the bundled synthetic sample data.
+70 tests cover phrase/negation/intensifier matching, explicit rating parsing,
+sheet classification, identity resolution, scoring bounds and "unknown ≠
+negative" behavior, engagement-gated persona classification, persona grouping
+and not-applicable cells, the score-band rendering, the circumplex layout
+invariants, the opportunity rosters, and an end-to-end run against the bundled
+synthetic sample data. The `.pptx` deck and the evidence workbooks are not
+covered by the suite — check those by eye after changing `pptx_export.py` or
+`reports.py`.
 
 ## Project layout
 
@@ -482,11 +535,24 @@ jabc/
   scoring.py                     # deterministic theme scoring formula
   persona.py                     # engagement-gated persona classification
   confidence.py                  # confidence/uncertainty model
-  matrix.py                      # Brand Health Matrix aggregation
-  export.py                      # CSV/Excel writers, conditional formatting, heatmap
+  matrix.py                      # Brand Health Matrix aggregation + not-applicable cells
+  circumplex.py                  # factor circumplex layout + PNG renderer
+  opportunities.py               # opportunity roster loading + validation
+  theme_priority.py              # opportunity Value x Difficulty quadrant chart
+  reports.py                     # the two per-chart evidence workbooks
+  pptx_export.py                 # every chart again, as editable PowerPoint shapes
+  export.py                      # CSV/Excel writers, score faces, heatmap, score-scale key
   calibration.py                 # human-review calibration workflow
   pipeline.py                    # orchestrates all of the above
-config/                          # all tunable YAML configuration
+config/                          # all tunable YAML configuration (9 files)
 sample_data/                     # synthetic demo workbooks + generator script
-tests/                           # pytest suite
+tests/                           # pytest suite (70 tests)
+outputs/                         # default --output_dir; checked-in example run
+AI_Sentiment_Circumplex_Implementation.md   # design note only -- see below
 ```
+
+`AI_Sentiment_Circumplex_Implementation.md` is a **proposal, not a description
+of this code**. It sketches a different chart — one that plots respondents by
+their overall disposition, where the implemented `factor_circumplex.png` plots
+motivators and barriers. Nothing in `jabc/` builds it; read it as a design
+option that was written up and not taken.
