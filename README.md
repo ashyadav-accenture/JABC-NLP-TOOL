@@ -314,8 +314,11 @@ The two never read each other's data. The frequency column is the coded number
 in both. The names column differs in kind: the opportunity roster is part of the
 coding, so it is exact and its count matches; the motivator/barrier config
 carries no per-person attribution, so those names are detected here by cue
-matching and **will not always agree with the coded frequency** (B4 is coded 8
-but only two transcripts trip its cues — a thin lexicon, not a smaller finding).
+matching and **will not always agree with the coded frequency** — usually by a
+wide margin, since a cue lexicon only fires on the wording it was written for.
+On the bundled sample data B3 is coded 8 but trips its cues in two transcripts,
+and most factors detect nobody at all. Read a short names column as a thin
+lexicon, never as a smaller finding: the coded frequency is the number.
 
 ## Opportunity prioritization
 
@@ -476,8 +479,9 @@ outputs.
 
 ## Design notes & known limitations
 
-- **Respondent identity**: resolved via (1) explicit ID/name found in the
-  workbook, (2) filename, in that priority order. Low-confidence
+- **Respondent identity**: resolved via explicit ID, then explicit name, then
+  workbook metadata, then the filename, then sheet grouping — the source that
+  won is recorded per respondent as `respondent_id_source`. Low-confidence
   resolutions are flagged `manual_review_flag = True`.
 - **Multiple completed sheets in one workbook** are treated as separate
   respondents at reduced confidence (we cannot safely assume they're the
@@ -548,11 +552,4 @@ config/                          # all tunable YAML configuration (9 files)
 sample_data/                     # synthetic demo workbooks + generator script
 tests/                           # pytest suite (70 tests)
 outputs/                         # default --output_dir; checked-in example run
-AI_Sentiment_Circumplex_Implementation.md   # design note only -- see below
 ```
-
-`AI_Sentiment_Circumplex_Implementation.md` is a **proposal, not a description
-of this code**. It sketches a different chart — one that plots respondents by
-their overall disposition, where the implemented `factor_circumplex.png` plots
-motivators and barriers. Nothing in `jabc/` builds it; read it as a design
-option that was written up and not taken.
