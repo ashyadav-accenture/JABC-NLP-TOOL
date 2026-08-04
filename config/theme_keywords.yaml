@@ -1,0 +1,168 @@
+# theme_keywords.yaml
+# Positive / negative single-word-or-short keyword dictionaries per Brand Health Theme.
+# Phrase-level rules (multi-word, negation, intensifiers) live in phrase_rules.yaml and
+# always take precedence over these keyword matches (see scoring.py / evidence.py).
+
+awareness:
+  positive:
+    - familiar
+    - heard of
+    - aware
+    - know about
+    - first heard
+    - presented
+    - presentation
+    - outreach
+    - principals
+    - vice-principals
+    - superintendents
+    - program already happening
+    - long-standing
+    - recognize the name
+    - well known
+  negative:
+    - never heard
+    - not familiar
+    - don't know
+    - dont know
+    - unsure
+    - unfamiliar
+    - no idea
+    - never come across
+
+understanding:
+  positive:
+    - financial literacy
+    - financial health
+    - work readiness
+    - entrepreneurship
+    - student outcomes
+    - real-world
+    - real world
+    - experiential learning
+    - hands-on
+    - hands on
+    - ready-made
+    - ready made
+    - educational classes
+    - experts
+    - business professionals
+    - curriculum
+    - programs
+    - value
+    - skills
+  negative:
+    - unclear
+    - not sure what
+    - dont understand
+    - don't understand
+    - no idea what
+    - cant explain
+    - can't explain
+    - vague
+
+trust:
+  positive:
+    - excellent
+    - helpful
+    - really helpful
+    - enthusiastic
+    - lovely
+    - robust
+    - trust
+    - confidence
+    - reliable
+    - strong program
+    - good program
+    - positive experience
+    - credible
+    - high quality
+    - professional
+    - responsive
+  negative:
+    - skeptical
+    - concern
+    - concerns
+    - poor quality
+    - unreliable
+    - inconsistent
+    - hesitant
+    - not confident
+
+relevance:
+  positive:
+    - aligns with curriculum
+    - instructional goals
+    - student achievement
+    - future options
+    - post-secondary
+    - post secondary
+    - financial literacy
+    - work readiness
+    - entrepreneurship
+    - real life connections
+    - student needs
+    - career exposure
+    - numeracy
+    - relevant
+    - fits
+    - classroom time
+    - worth classroom time
+  negative:
+    - not relevant
+    - doesnt fit
+    - doesn't fit
+    - limited need
+    - low priority
+    - not a priority
+
+ease_of_engagement:
+  positive:
+    - little prep
+    - ready-made
+    - ready made
+    - doesnt require much
+    - doesn't require much
+    - work smarter not harder
+    - easy
+    - registration
+    - navigation
+    - program matching
+    - communication
+    - reminders
+    - follow-ups
+    - follow ups
+  negative:
+    - scheduling
+    - barriers
+    - challenges
+    - turnover
+    - continuity
+    - remote schools
+    - smaller schools
+    - teacher workload
+    - difficult
+    - hard to coordinate
+    - administrative burden
+    - limited capacity
+
+advocacy:
+  positive:
+    - recommend
+    - champion
+    - 100% would champion
+    - brought it forward
+    - share with colleagues
+    - highlight reel
+    - promote
+    - advocate
+    - continue support
+    - expand
+    - traction
+    - interested in developing
+  negative:
+    - would not recommend
+    - unlikely to recommend
+    - not champion
+    - no evidence of promoting
+    - passive support only

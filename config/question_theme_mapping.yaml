@@ -1,0 +1,95 @@
+# question_theme_mapping.yaml
+#
+# Maps question content (matched against question_category + question_text, case
+# insensitive substring match) to weighted Brand Health Themes. This drives the
+# "Contextual Evidence Score" (40% of the theme scoring formula) which must carry
+# more weight than generic keyword matches found anywhere in an answer.
+#
+# `explicit_rating_theme` marks a question as containing a direct numeric rating
+# that should be normalized to a 1-5 scale and used as the Explicit Rating Score.
+#
+# `behavioral_flags` lets a question contribute directly to behavioral/engagement
+# state detection (section 34) rather than (or in addition to) a perception theme.
+
+section_theme_defaults:
+  # Fallback theme weights by interview section letter, used only when no more
+  # specific rule below matches. Mirrors Section 7 of the build spec.
+  A: {relevance: 0.4}
+  B: {awareness: 0.5, relevance: 0.3, ease_of_engagement: 0.3}
+  C: {awareness: 0.5, understanding: 0.5, trust: 0.4}
+  D: {relevance: 0.4, trust: 0.4, ease_of_engagement: 0.3}
+  E: {trust: 0.5, ease_of_engagement: 0.4, relevance: 0.3}
+  F: {ease_of_engagement: 0.4, trust: 0.3, relevance: 0.3, advocacy: 0.3}
+  G: {awareness: 0.4, relevance: 0.3, ease_of_engagement: 0.3}
+  H: {relevance: 0.4, trust: 0.4, ease_of_engagement: 0.3}
+  I: {advocacy: 0.5, awareness: 0.3, ease_of_engagement: 0.3, relevance: 0.3}
+
+question_rules:
+  - match_any: ["familiarity rating", "how familiar are you", "familiar with jabc before"]
+    theme_weights: {awareness: 1.0}
+    explicit_rating_theme: awareness
+
+  - match_any: ["first thing that comes to mind", "first come to mind"]
+    theme_weights: {awareness: 0.8, trust: 0.5}
+
+  - match_any: ["where impressions come from", "where does your impression"]
+    theme_weights: {awareness: 0.7, trust: 0.6}
+
+  - match_any: ["describe jabc to a colleague", "describe jabc to another"]
+    theme_weights: {understanding: 1.0, trust: 0.3, awareness: 0.5}
+
+  - match_any: ["worth classroom time", "makes a program worth"]
+    theme_weights: {relevance: 1.0, trust: 0.4}
+
+  - match_any: ["stand out", "what would make jabc stand out"]
+    theme_weights: {relevance: 0.7, understanding: 0.6}
+
+  - match_any: ["recent jabc experience", "your experience with jabc"]
+    theme_weights: {trust: 0.8, ease_of_engagement: 0.5}
+
+  - match_any: ["program matching", "navigation", "finding the right program"]
+    theme_weights: {ease_of_engagement: 1.0}
+
+  - match_any: ["registration process", "registration"]
+    theme_weights: {ease_of_engagement: 1.0, trust: 0.2}
+
+  - match_any: ["communication", "reminders", "follow-ups", "follow ups"]
+    theme_weights: {ease_of_engagement: 0.7, trust: 0.4}
+
+  - match_any: ["district fit", "instructional goals", "align with your district"]
+    theme_weights: {relevance: 1.0}
+
+  - match_any: ["barriers to introducing", "barriers", "what stops you"]
+    theme_weights: {ease_of_engagement: 1.0}
+    behavioral_flags: [has_current_barriers]
+
+  - match_any: ["preferred communication channels", "how would you like to hear"]
+    theme_weights: {ease_of_engagement: 0.6, awareness: 0.4}
+
+  - match_any: ["first-of-mind", "first of mind", "top of mind"]
+    theme_weights: {awareness: 0.6, understanding: 0.4, advocacy: 0.4}
+
+  - match_any: ["would you recommend", "would you champion", "likely to recommend", "likely are you to recommend"]
+    theme_weights: {advocacy: 1.0, trust: 0.3}
+    explicit_rating_theme: advocacy
+    behavioral_flags: [has_advocated_for_jabc]
+
+  - match_any: ["have you used jabc before", "have you previously participated", "prior participation"]
+    theme_weights: {awareness: 0.4}
+    behavioral_flags: [has_prior_jabc_engagement]
+
+  - match_any: ["are you currently using jabc", "currently participating in jabc", "this school year"]
+    theme_weights: {trust: 0.3}
+    behavioral_flags: [has_current_jabc_engagement]
+
+  - match_any: ["stopped using", "no longer use", "why did participation decline", "why did you stop"]
+    theme_weights: {ease_of_engagement: 0.5, trust: 0.3}
+    behavioral_flags: [has_reduced_or_stopped_engagement]
+
+  - match_any: ["other external programs", "competing programs", "other providers you use"]
+    theme_weights: {relevance: 0.3}
+    behavioral_flags: [has_used_competing_programs]
+
+  - match_any: ["open to trying", "open to new programs", "interested in exploring"]
+    theme_weights: {relevance: 0.3}
+    behavioral_flags: [is_open_to_external_programming]

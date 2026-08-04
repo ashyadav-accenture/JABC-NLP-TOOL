@@ -1,0 +1,190 @@
+# persona_rules.yaml
+#
+# The four Brand Personas, encoded exactly as the JABC persona framework defines
+# them. Each persona is defined FIRST by an engagement gate (the educator's
+# relationship with JABC, plus their disposition toward external classroom
+# programming) and only SECOND by where their perception scores land.
+#
+# Why the gate comes first
+# ------------------------
+# The personas are relationship states, not score bands. Rachel and Marci both
+# describe real friction with JABC's portal and coordination, yet they are
+# Champions because they are running the programs now and would run them again.
+# Cole is warm about JABC and would happily return, yet he is a Non-Active
+# Supporter because he last ran it a decade ago. Andrea and Rory are both
+# unfamiliar with JABC, but Andrea actively runs another external program and
+# liked it (Prospect) while Rory tried one, it "only worked out once", and he
+# now weighs every outside speaker as a risk (Newbie). No arrangement of
+# theme-score thresholds separates those pairs; engagement state does, cleanly.
+#
+# Theme scores still matter -- they set the persona-fit score used for the
+# classification margin, confidence, and manual-review flagging, and they decide
+# the persona when the interview carries no usable engagement evidence at all.
+
+personas:
+  brand_champion:
+    display_name: "Brand Champion"
+    definition: >-
+      Highly engaged with JABC and a strong advocate for experiential learning.
+      Trusts the JABC brand, consistently recognizes its value to students, and
+      is willing to keep participating and to recommend JABC to peers.
+    sentiment_profile:
+      - "Runs JABC programs frequently"
+      - "Positive sentiment towards the program"
+      - "Says they would run it again"
+    # Gate: JABC history that is live right now.
+    engagement_gate:
+      all_of: [has_jabc_experience, has_current_jabc_engagement]
+    # Strengthens the gate match but is not required -- Rachel is a Champion on
+    # current engagement alone, without ever being asked the recommend question.
+    supporting_flags: [intends_to_continue_jabc, has_advocated_for_jabc]
+    typical_range:
+      awareness: [4, 5]
+      understanding: [4, 5]
+      trust: [3, 5]
+      relevance: [4, 5]
+      ease_of_engagement: [2, 5]
+      advocacy: [4, 5]
+
+  non_active_supporter:
+    display_name: "Non-Active Supporter"
+    definition: >-
+      Previously engaged with JABC, but participation has declined due to
+      competing priorities, scheduling, workload, changes in teaching
+      responsibilities, or program experience and fit.
+    sentiment_profile:
+      - "Ran a JABC program before but has since stopped"
+    engagement_gate:
+      all_of: [has_jabc_experience, has_lapsed_jabc_engagement]
+    supporting_flags: [has_current_barriers, intends_to_continue_jabc]
+    typical_range:
+      awareness: [3, 5]
+      understanding: [3, 5]
+      trust: [3, 5]
+      relevance: [2, 4]
+      ease_of_engagement: [1, 3]
+      advocacy: [2, 4]
+
+  brand_prospect:
+    display_name: "Brand Prospect"
+    definition: >-
+      Aware of JABC but with a limited understanding of its programs and value
+      proposition. Open to external classroom programs and actively explores or
+      uses providers other than JABC, but has not yet seen a compelling reason
+      to engage with JABC specifically.
+    sentiment_profile:
+      - "Names other programs they run, but no experience running a JABC program"
+      - "Interested, positive sentiment around introducing external things to the classroom"
+    # Gate: no JABC history, but an active and positive relationship with
+    # external programming in general.
+    engagement_gate:
+      none_of: [has_jabc_experience]
+      all_of: [explores_external_programs]
+    supporting_flags: [runs_external_programs, has_positive_external_experience, is_aware_of_jabc]
+    # These ranges describe the *typical* Prospect and are only consulted for
+    # the margin, and for the decision itself when an interview carries no
+    # engagement evidence at all. They must stay narrower than Brand Newbie's on
+    # awareness -- otherwise Prospect's range strictly contains Newbie's and the
+    # no-evidence fallback can never choose Newbie however low awareness is.
+    # Genuinely unaware Prospects (an educator who has never heard of JABC but
+    # happily runs other providers) are caught by the engagement gate, which
+    # outranks the fit score.
+    typical_range:
+      awareness: [2, 4]
+      understanding: [1, 3]
+      trust: [2, 4]
+      relevance: [2, 4]
+      ease_of_engagement: [2, 4]
+      advocacy: [1, 2]
+
+  brand_newbie:
+    display_name: "Brand Newbie"
+    definition: >-
+      Little or no awareness of JABC. Has learnt about or tried external
+      classroom programs but has not found one that consistently meets classroom
+      needs or delivers enough value to become a regular partner. Requires a
+      clear reason to notice and consider JABC.
+    sentiment_profile:
+      - "Didn't have a good experience running external programs in the past"
+      - "Fear of trying external programs / introducing external things to the classroom"
+      - "Or no experience running an external classroom program at all"
+    # Gate: no JABC history, and external programming has either never happened
+    # or did not go well enough to become a habit.
+    engagement_gate:
+      none_of: [has_jabc_experience, explores_external_programs]
+    supporting_flags:
+      - has_negative_external_experience
+      - is_hesitant_about_external_programs
+      - has_no_external_experience
+    typical_range:
+      awareness: [1, 2]
+      understanding: [1, 2]
+      trust: [1, 3]
+      relevance: [1, 3]
+      ease_of_engagement: [2, 3]
+      advocacy: [1, 1]
+
+# --- Reported persona groups ----------------------------------------------
+# The four personas above remain the unit of classification -- they are the
+# relationship states the engagement gates test for. Reporting (the Brand
+# Health Matrix, the heatmap, the smiley grid, the circumplex rings) is done on
+# the two merged personas below.
+#
+# The merge is safe to do at the reporting layer because each pair shares the
+# reporting question -- first-hand JABC experience, yes or no -- and because
+# the pairs agree on which themes are answerable: neither Prospects nor Newbies
+# were routed through Section E or asked Q9.3, so no cell is blanked for only
+# half a group.
+persona_groups:
+  established_supporters:
+    display_name: "Established Supporters"
+    includes: [brand_champion, non_active_supporter]
+    definition: >-
+      Educators who have previously engaged with JABC and have firsthand
+      experience with its programs. They recognize the value of JABC and hold
+      positive perceptions of the brand. While some remain active advocates and
+      others have become inactive due to competing priorities or changing
+      responsibilities, they represent a strong foundation for continued
+      engagement and advocacy.
+  potential_adopters:
+    display_name: "Potential Adopters"
+    includes: [brand_prospect, brand_newbie]
+    definition: >-
+      Educators who have limited or no direct experience with JABC. They range
+      from those who are aware of the brand but have not yet participated to
+      those with little or no awareness. They are open to external classroom
+      programming but require greater awareness, understanding, and a compelling
+      value proposition before engaging with JABC.
+
+# Order in which engagement gates are evaluated. The first persona whose gate is
+# satisfied wins; the gates above are written to be mutually exclusive, so this
+# order only matters if the rules are later loosened.
+gate_precedence:
+  - brand_champion
+  - non_active_supporter
+  - brand_prospect
+  - brand_newbie
+
+tie_breaking:
+  # Applied only when no engagement gate is satisfied (i.e. the interview
+  # carries no usable engagement evidence) and the winner comes from theme-score
+  # fit alone.
+  - "If advocacy is very high and trust/understanding are high, prefer Brand Champion."
+  - "If past engagement and current disengagement are present, prefer Non-Active Supporter even when sentiment is positive."
+  - "If awareness exists but understanding/advocacy are low, prefer Brand Prospect."
+  - "If awareness is very low, prefer Brand Newbie."
+  - "If evidence is weak or contradictory, output Manual Review Required and include the closest likely persona."
+
+# --- Scoring / confidence knobs -------------------------------------------
+# How strongly a satisfied engagement gate outranks pure theme-score fit. The
+# gate is the definition, so it must dominate; the fit score still orders the
+# remaining personas and sets the margin.
+gate_bonus: 6.0
+# Each satisfied `supporting_flags` entry adds this much, so a Champion who also
+# says they would run it again separates further from the runner-up.
+supporting_flag_bonus: 0.5
+
+classification_margin_threshold: 0.20
+unknown_default_score: 3.0
+manual_review_threshold: 0.55
+consistency_reference_stdev: 2.5

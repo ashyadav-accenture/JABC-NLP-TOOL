@@ -1,0 +1,189 @@
+# opportunities.yaml
+#
+# The seven opportunity themes from the coded interview analysis, plotted by
+# jabc/theme_priority.py as the "Prioritizing Opportunities" quadrant chart.
+#
+# Previously eight. "Activate peer champions and word-of-mouth advocacy" is no
+# longer a theme of its own: peer referrals and teacher testimonials are now
+# part of O3, which is where educators said that trust actually travels. See
+# O3's note for what that merge did to its numbers.
+#
+# Three different sources of truth, deliberately separated
+# --------------------------------------------------------
+#   `mentions` / `people`   From the human-coded analysis. AUTHORITATIVE, and
+#                           never recomputed here. In this dataset each person
+#                           is counted once per theme, so the two numbers are
+#                           identical -- `people` is kept as its own field
+#                           anyway, because that stops being true the moment a
+#                           theme is coded per-answer instead of per-person.
+#
+#   `difficulty`            AUTHORED. How hard the change is for JABC to make
+#                           is a judgement about their roadmap, budget and
+#                           partnerships. Nothing in a set of interview
+#                           transcripts measures it, so it is declared here
+#                           rather than derived from a number that would only
+#                           look objective. This is the field to argue about.
+#
+#   `mentioned_by`          From the coded analysis, kept so the chart can be
+#                           audited back to named respondents and so
+#                           validate_opportunities() can re-check the roster
+#                           against the interview files on every run.
+#
+# Relative Value on the chart is `mentions`: how many educators independently
+# raised the theme is the only demand signal the interviews actually carry.
+
+difficulty_scale:
+  # Anchors for the authored `difficulty` values, so the numbers mean the same
+  # thing across entries and can be revised consistently.
+  0.2: "Messaging or packaging change -- say what is already true, more clearly"
+  0.4: "Process or content re-organisation -- existing assets, new structure"
+  0.6: "New sustained programme -- needs owners and ongoing effort"
+  0.8: "Platform or content rebuild -- engineering or production spend"
+
+opportunities:
+  - code: O1
+    rank: 1
+    title: "Lead with engaging, real-world expert delivery"
+    mentions: 10
+    people: 10
+    difficulty: 0.35
+    difficulty_note: >-
+      Mostly a positioning change; the volunteer network already exists, but
+      producing testimonials and classroom examples takes production effort.
+    opportunity: >-
+      Communicate classroom value; emphasize real-world industry exposure and
+      community volunteers. Position JABC as the organization that connects
+      students with credible professionals and practical, real-world
+      experiences -- not simply as a provider of financial literacy content.
+      Show the presenter experience through testimonials, short videos and
+      concrete classroom examples.
+    mentioned_by: [Alison Bain, Alvina Last, Amanda Reid, Erin Paul, Karina Thygesen,
+                   Marci Goldman, Rory Payment, Sarah Williams, Shannon Soper, Viveka Johnson]
+
+  - code: O2
+    rank: 2
+    title: "Simplify how educators discover, access and navigate programs"
+    mentions: 8
+    people: 8
+    difficulty: 0.80
+    difficulty_note: >-
+      Portal, login and resource architecture -- engineering work, not copy.
+    opportunity: >-
+      Simplify the website, program discovery and registration, and the use of
+      the educator portal. Create a clearer path from awareness to program
+      selection, registration and materials: simple grade/subject filters, a
+      visible educator login, clearer onboarding and consolidated resources.
+    mentioned_by: [Andrea Nasiopoulos, Ashley Warawa, David Welch, Marci Goldman,
+                   Rachel Tremblay-Cote, Sarah Williams, Shannon Soper, Zain Rehmtulla]
+
+  - code: O3
+    rank: 3
+    title: "Increase awareness through trusted educator channels"
+    mentions: 11
+    people: 11
+    difficulty: 0.55
+    # Merges the separately-coded "Activate peer champions and word-of-mouth
+    # advocacy" theme (8 + 7 people). The merged count is 11, not 15: the two
+    # rosters shared four names (Andrea Nasiopoulos, Karina Thygesen, Rory
+    # Payment, Viveka Johnson), and summing would have counted each of them
+    # twice, inflating both the bubble and its position on the value axis. 11 is
+    # the union of the two coded rosters below, so validate_opportunities still
+    # reconciles it against the interview files name by name.
+    #
+    # Difficulty moved 0.50 -> 0.55: the ambassador side needs recruitment,
+    # materials and someone to keep it alive, on top of the district and PD
+    # relationship work.
+    difficulty_note: >-
+      Needs district relationships, PD-event presence and publication slots,
+      plus an owner for the ambassador side -- sustained relationship work
+      rather than a one-off campaign.
+    opportunity: >-
+      Increase educator awareness and brand visibility; strengthen district and
+      educator partnerships; increase teacher testimonials and peer referrals;
+      promote on Professional Development days. Expand beyond general outreach
+      by using district communications, educator email, PD events, teacher
+      publications, conferences and administrator networks, supported by
+      staff-meeting materials, peer demonstrations and referral prompts.
+      Educators repeatedly indicated that colleague experience is more
+      persuasive than cold outreach, and that awareness should be built where
+      they already look for trusted opportunities.
+    mentioned_by: [Amanda Reid, Andrea Nasiopoulos, Ashley Warawa, Cole Auringer,
+                   David Scott, David Welch, Karina Thygesen, Rory Payment,
+                   Sarah Williams, Shannon Soper, Viveka Johnson]
+
+  - code: O4
+    rank: 4
+    title: "Make grade, curriculum and student fit immediately clear"
+    mentions: 8
+    people: 8
+    difficulty: 0.30
+    difficulty_note: >-
+      Re-organising and re-labelling an existing catalogue around educator
+      need; no new programme content required.
+    opportunity: >-
+      Develop grade- and subject-specific resources; communicate curriculum
+      alignment and classroom value. Organize and communicate programs around
+      educator needs -- such as "for Grade 7 financial literacy" or "for
+      secondary career exploration" -- rather than expecting educators to
+      interpret the broader portfolio.
+    mentioned_by: [Amanda Reid, David Scott, Erin Paul, Lori Christensen,
+                   Rachel Tremblay-Cote, Sarah Williams, Shannon Soper, Viveka Johnson]
+
+  - code: O5
+    rank: 5
+    title: "Promote JABC as low-prep, flexible and ready to use"
+    mentions: 7
+    people: 7
+    difficulty: 0.20
+    difficulty_note: >-
+      The offer is already free, facilitated and curriculum-connected. This is
+      stating plainly what is true today -- the cheapest move on the chart.
+    opportunity: >-
+      Provide flexible delivery options and promote ready-to-use resources that
+      reduce teacher preparation. Make the teacher value proposition explicit:
+      free, facilitated, curriculum-connected and supported by ready-to-use
+      materials, with concise information on preparation time, session length,
+      educator responsibilities and available follow-up.
+    mentioned_by: [Alison Bain, Amanda Reid, Ashley Warawa, Karina Thygesen,
+                   Shannon Soper, Soraya Rajan, Viveka Johnson]
+
+  - code: O6
+    rank: 6
+    title: "Communicate at the right time with the right message"
+    mentions: 7
+    people: 7
+    difficulty: 0.30
+    difficulty_note: >-
+      Calendar and template changes to existing comms; no new infrastructure.
+    opportunity: >-
+      Communicate at the right cadence for the school year -- late August /
+      early September for annual planning, June for next-year planning, January
+      for second-semester opportunities, and around Pro-D and district planning
+      periods when educators are actively seeking resources. Keep each
+      communication concise and immediately relevant (easy to find information,
+      clear call to action) and reduce email fatigue by not re-sending repeated
+      emails and feedback requests. Explain booking timelines, program steps,
+      required preparation and major platform changes, tailored to the
+      educator's registered program.
+    mentioned_by: [David Welch, Erin Paul, Kimberly Hlina, Sarah Williams,
+                   Shannon Soper, Soraya Rajan, Zain Rehmtulla]
+
+  - code: O7
+    rank: 7
+    title: "Modernize and tailor content to age, culture and local context"
+    mentions: 6
+    people: 6
+    difficulty: 0.85
+    difficulty_note: >-
+      Re-shooting video, refreshing economic data and building culturally
+      specific variants is production spend, and has to be repeated to stay
+      current.
+    opportunity: >-
+      Cultural relevance, local context, modernization of content and
+      age-appropriate tailoring beyond basic grade fit.
+      Refresh examples, videos, design and economic data; test youth-facing
+      content with students; and tailor messaging for specific audiences,
+      including Indigenous learners and students whose pathways may not centre
+      on university or traditional business careers.
+    mentioned_by: [Alison Bain, Ashley Warawa, David Welch, Kimberly Hlina,
+                   Rachel Tremblay-Cote, Sarah Williams]

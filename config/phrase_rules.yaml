@@ -1,0 +1,143 @@
+# phrase_rules.yaml
+# Multi-word phrase rules take precedence over single keyword matches (see section 30.2
+# of the build spec). Each rule names the theme it supports, the direction of the
+# evidence, and a base strength (0-1) before negation/intensifier adjustment.
+
+negation_words:
+  - not
+  - never
+  - "no"
+  - none
+  - hardly
+  - rarely
+  - cannot
+  - "can't"
+  - "cant"
+  - didnt
+  - "didn't"
+  - dont
+  - "don't"
+  - wouldnt
+  - "wouldn't"
+  - isnt
+  - "isn't"
+  - wasnt
+  - "wasn't"
+  - unlikely
+
+intensifier_words:
+  - very
+  - extremely
+  - strongly
+  - "100%"
+  - always
+  - consistently
+  - really
+  - absolutely
+  - highly
+  - definitely
+
+# Window (in words) that a negation word can act over before/after a matched phrase.
+negation_window: 3
+intensifier_window: 3
+
+phrase_rules:
+  # --- Advocacy ---
+  - phrase: "would not recommend"
+    theme: advocacy
+    direction: negative
+    strength: 0.95
+  - phrase: "would recommend"
+    theme: advocacy
+    direction: positive
+    strength: 0.85
+  - phrase: "would champion"
+    theme: advocacy
+    direction: positive
+    strength: 0.9
+  - phrase: "unlikely to recommend"
+    theme: advocacy
+    direction: negative
+    strength: 0.9
+
+  # --- Ease of Engagement ---
+  - phrase: "not difficult"
+    theme: ease_of_engagement
+    direction: positive
+    strength: 0.6
+  - phrase: "difficult to schedule"
+    theme: ease_of_engagement
+    direction: negative
+    strength: 0.85
+  - phrase: "hard to coordinate"
+    theme: ease_of_engagement
+    direction: negative
+    strength: 0.8
+  - phrase: "easy to register"
+    theme: ease_of_engagement
+    direction: positive
+    strength: 0.8
+  - phrase: "no longer works for us"
+    theme: ease_of_engagement
+    direction: negative
+    strength: 0.85
+
+  # --- Trust ---
+  - phrase: "excellent but difficult"
+    theme: trust
+    direction: positive
+    strength: 0.8
+  - phrase: "we love"
+    theme: trust
+    direction: positive
+    strength: 0.75
+  - phrase: "not confident"
+    theme: trust
+    direction: negative
+    strength: 0.75
+
+  # --- Awareness ---
+  - phrase: "not familiar"
+    theme: awareness
+    direction: negative
+    strength: 0.85
+  - phrase: "never heard"
+    theme: awareness
+    direction: negative
+    strength: 0.9
+  - phrase: "heard the name before"
+    theme: awareness
+    direction: positive
+    strength: 0.5
+
+  # --- Understanding ---
+  - phrase: "dont understand"
+    theme: understanding
+    direction: negative
+    strength: 0.85
+  - phrase: "don't understand"
+    theme: understanding
+    direction: negative
+    strength: 0.85
+  - phrase: "not sure what"
+    theme: understanding
+    direction: negative
+    strength: 0.7
+
+  # --- Relevance ---
+  - phrase: "not relevant"
+    theme: relevance
+    direction: negative
+    strength: 0.85
+  - phrase: "doesnt fit"
+    theme: relevance
+    direction: negative
+    strength: 0.75
+  - phrase: "doesn't fit"
+    theme: relevance
+    direction: negative
+    strength: 0.75
+  - phrase: "worth classroom time"
+    theme: relevance
+    direction: positive
+    strength: 0.8

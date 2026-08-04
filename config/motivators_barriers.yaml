@@ -1,0 +1,450 @@
+# motivators_barriers.yaml
+#
+# The coded motivators and barriers from the interview analysis. The circumplex
+# plots the top five of each (replacing the six Brand Health Themes); the
+# persona-share ring around each circle is unchanged.
+#
+# Factors coded but not currently plotted stay in this file rather than being
+# deleted -- they remain part of the coded analysis and the evidence workbook,
+# and dropping them here would quietly destroy human-coded data because a chart
+# got shorter.
+#
+# Two different sources of truth, deliberately separated
+# -----------------------------------------------------
+#   `frequency`  comes from the human-coded analysis and is AUTHORITATIVE. It
+#                sets each circle's rank and size. Nothing in this pipeline
+#                recomputes it -- re-deriving counts by keyword matching would
+#                silently disagree with the published table.
+#
+#   `cues`       are used for ONE thing only: attributing mentions to Brand
+#                Personas, which becomes the ring around each circle. A cue hit
+#                is a pointer to who raised a factor, never a recount of how
+#                often it was raised.
+#
+# So a cue lexicon that under-matches makes a circle's RING less certain
+# (surfaced as `detected_mentions` in the sidecar CSV), but cannot move the
+# circle or contradict the coded frequencies.
+
+detection:
+  # An item is counted as mentioned once per answer, however many of its cues
+  # fire there -- otherwise a single discursive answer that restates the same
+  # point five different ways would outweigh five separate respondents.
+  one_mention_per_answer: true
+  # Answers shorter than this are stubs ("yes", "n/a") and carry no usable
+  # content, so they are skipped.
+  min_answer_chars: 25
+  # Below this many detected mentions a factor's persona ring rests on too few
+  # people to trust; it is flagged in the key. This never affects POSITION,
+  # which comes from the coded frequency and the authored diagram alone.
+  min_mentions_for_ring: 3
+
+# ---------------------------------------------------------------------------
+# Circumplex layout
+# ---------------------------------------------------------------------------
+# The circumplex plots the ten factors from the approved Factor Circumplex
+# diagram. Its two axes come from DIFFERENT places, and the distinction matters
+# when reading the chart:
+#
+#   horizontal  AUTHORED. "Fundamental factor for consideration" vs "Adds-on"
+#               is an editorial judgement about how decisive a factor is, made
+#               when the diagram was drawn. Nothing in this pipeline measures
+#               it, so each item's `x` is transcribed from that diagram and is
+#               never recomputed -- the chart would otherwise quietly overwrite
+#               a human decision with a number that does not mean the same
+#               thing.
+#
+#   vertical    MEASURED. Distance from the centre is the coded frequency of
+#               mention, normalised against the highest-frequency factor.
+#               Motivators sit above the line (positive effect), barriers
+#               below (negative effect).
+#
+# `x` is in [-1, 1] as a fraction of the circle's radius. Circle size also
+# tracks frequency, so it reinforces the vertical position rather than adding a
+# third variable.
+circumplex_layout:
+  axis_labels:
+    top: "HIGH POSITIVE EFFECT"
+    top_note: "frequency of mention"
+    bottom: "HIGH NEGATIVE EFFECT"
+    left: "FUNDAMENTAL FACTOR\nFOR CONSIDERATION"
+    right: "ADD-ONS"
+
+  quadrant_labels:
+    upper_left: "DETERMINING"
+    upper_right: "KEEP ENGAGING"
+    lower_left: "CHURN FACTOR"
+    lower_right: "FRICTION FOR UX"
+
+  # The top five motivators and top five barriers, in the positions the diagram
+  # places them. `icon` selects a hand-drawn glyph from
+  # circumplex.ICON_DRAWERS -- matplotlib's Agg backend cannot render colour
+  # emoji (they come out as blank "tofu" boxes), so the icons are built from
+  # primitive shapes.
+  #
+  # Two barriers are new to the chart and had no position on the approved
+  # diagram: curriculum_integration and low_awareness. Both read as fundamental
+  # rather than add-on, so both sit left of centre. Their exact x was then
+  # pushed further left than a first pass had them (-0.45 and -0.60) because at
+  # those values the three left-hand barrier circles collided: with y fixed by
+  # frequency and no nudging allowed, x is the only free axis, and three
+  # overlapping discs hide the persona rings that are the only measured thing
+  # on the chart. The ordering the diagram encodes -- awareness the most
+  # fundamental of the three -- is unchanged.
+  items:
+    - {ref: curriculum_alignment,         x: -0.41, icon: book}
+    - {ref: ready_to_use_resources,       x: -0.19, icon: package}
+    - {ref: trust_referrals,              x: -0.02, icon: referral}
+    - {ref: engaging_hands_on,            x:  0.37, icon: spark}
+    - {ref: real_world_experts,           x:  0.59, icon: expert}
+    - {ref: low_awareness,                x: -0.85, icon: megaphone}
+    - {ref: curriculum_integration,       x: -0.65, icon: puzzle}
+    - {ref: information_overload,         x: -0.50, icon: stale_doc}
+    - {ref: instructional_time,           x: -0.24, icon: hourglass}
+    - {ref: discovery_registration,       x:  0.49, icon: monitor}
+
+
+motivators:
+  - key: engaging_hands_on
+    code: M1
+    rank: 1
+    label: "Hands-on, experiential learning that engages"
+    frequency: 14
+    applies_to: "JABC and other programs"
+    summary: >-
+      Games, simulations, practical activities and memorable experiences that
+      sustain student attention and show clear relevance.
+    cues:
+      - "hands.?on"
+      - "engaging"
+      - "engaged"
+      - "\\bgames?\\b"
+      - "simulation"
+      - "interactive"
+      - "memorable"
+      - "students (?:really )?(?:loved|enjoyed|liked)"
+      - "kids (?:were|are|got) (?:all )?(?:engaged|into it)"
+      - "practical activit"
+      - "real.?life connection"
+
+  - key: real_world_experts
+    code: M2
+    rank: 2
+    label: "Real-world expertise from volunteers and industry"
+    frequency: 12
+    applies_to: "JABC and other programs"
+    summary: >-
+      Professionals bring credibility, lived experience and knowledge teachers
+      may not have themselves. Presenter quality strongly shapes the experience.
+    cues:
+      - "volunteer"
+      - "guest speaker"
+      - "presenter"
+      - "somebody from the community"
+      - "someone from the community"
+      - "from the industry"
+      - "real.?world"
+      - "business (?:guy|person|people|owner)"
+      - "professional(?:s)? (?:come|coming|came|who)"
+      - "lived experience"
+      - "people in the industry"
+      - "bringing (?:a )?(?:new|outside) person in"
+
+  - key: curriculum_alignment
+    code: M3
+    rank: 3
+    label: "Curriculum alignment and classroom relevance"
+    frequency: 10
+    applies_to: "JABC and other programs"
+    summary: >-
+      Programs are easier to justify when they address a specific curriculum
+      requirement, skill gap or unmet student need.
+    cues:
+      - "curriculum"
+      - "aligns? (?:with|to)"
+      - "alignment"
+      - "learning outcome"
+      - "instructional goal"
+      - "part of the (?:course|unit|curriculum)"
+      - "career ed"
+      - "financial literacy (?:unit|course|is)"
+      - "fits? (?:with|into) (?:what|my|our|the)"
+      - "meets? a need"
+
+  - key: ready_to_use_resources
+    code: M4
+    rank: 4
+    label: "Ready-to-use resources that reduce teacher preparation"
+    frequency: 9
+    applies_to: "JABC and other programs"
+    summary: >-
+      Complete lesson materials, slides, booklets, equipment and facilitated
+      delivery reduce planning and assessment burden.
+    cues:
+      - "ready.?to.?use"
+      - "they provide the (?:slides|materials|resources)"
+      - "instruction manual"
+      - "tool.?kit"
+      - "\\bslides?\\b"
+      - "booklets?"
+      - "support material"
+      - "lesson (?:plans?|materials?)"
+      - "everything (?:is )?provided"
+      - "don'?t have to (?:prep|prepare|plan)"
+      - "no prep"
+
+  - key: flexibility
+    code: M6
+    rank: 6
+    label: "Flexibility and ease of integration"
+    frequency: 7
+    applies_to: "JABC and other programs"
+    summary: >-
+      Modular content, adaptable timing, editable resources and the ability to
+      select only relevant components.
+    cues:
+      - "flexib"
+      - "modular"
+      - "adapt"
+      - "pick and choose"
+      - "editable"
+      - "work with the (?:classroom )?blocks"
+      - "fit(?:s|ted)? (?:it )?into (?:my|our|the) schedule"
+      - "select only"
+      - "skip the first few"
+
+  - key: trust_referrals
+    code: M5
+    rank: 5
+    label: "Trust, referrals and previous positive experience"
+    frequency: 7
+    applies_to: "JABC and other programs"
+    summary: >-
+      Educators often try or continue programs because of a colleague,
+      administrator, parent, district contact or prior successful delivery.
+    cues:
+      - "recommended by"
+      - "colleague (?:told|said|mentioned|recommended)"
+      - "admin (?:told|said|recommended)"
+      - "word of mouth"
+      - "referral"
+      - "heard (?:about it )?from (?:a|my|another)"
+      - "previous teacher"
+      - "kept (?:me )?coming back"
+      - "prior (?:good|positive|successful)"
+      - "one teach(?:er)? watch another"
+
+  - key: free_access
+    code: M7
+    rank: 7
+    label: "Free or affordable access"
+    frequency: 5
+    applies_to: "Particularly JABC"
+    summary: >-
+      Cost is a major constraint, especially for smaller schools and classrooms
+      with limited discretionary budgets.
+    cues:
+      - "\\bfree\\b"
+      - "no cost"
+      - "at no charge"
+      - "affordab"
+      - "budget"
+      - "cost(?:s)? (?:is|are|was|were)"
+      - "funding"
+      - "grant"
+
+barriers:
+  - key: instructional_time
+    code: B1
+    rank: 1
+    label: "Limited instructional time and scheduling"
+    frequency: 11
+    applies_to: "Both"
+    summary: >-
+      Programs are avoided when they feel like an additional class, require
+      extensive supervision or create too much preparation -- and when booking
+      timelines, session times and coordination steps do not fit the calendar
+      the teacher actually controls.
+    # Merges the separately-coded "Scheduling, coordination and timing" factor
+    # (coded frequency 7), whose cues follow the time cues below. The merged
+    # frequency stays 11 rather than 11 + 7: the coded counts are per-mention,
+    # so summing them would double-count every educator who raised both, and
+    # the circle's size and height would overstate what was actually coded.
+    cues:
+      - "prep(?:aration)? (?:time|burden|work)"
+      - "workload"
+      - "too much (?:work|prep|time)"
+      - "additional class"
+      - "extra class"
+      - "supervision"
+      - "hours? (?:a week|commitment|out of)"
+      - "how do i take .{0,20}hours"
+      - "a lot of (?:classroom )?time"
+      - "time (?:cost|commitment|consuming)"
+      - "don'?t have (?:the )?time"
+      - "instructional time"
+      - "class time"
+      # ...from the merged scheduling factor:
+      - "schedul"
+      - "booking"
+      - "coordinat"
+      - "months (?:in advance|to coordinate)"
+      - "timing"
+      - "didn'?t get back"
+      - "last 2 weeks of school"
+      - "back to back"
+      - "\\bdates?\\b"
+
+  - key: curriculum_integration
+    code: B2
+    rank: 2
+    label: "Difficulty integrating programs into curriculum"
+    frequency: 9
+    applies_to: "Both; particularly JABC expansion"
+    summary: >-
+      Educators outside Careers or Business may not immediately understand
+      which program is relevant to them, or how an external program slots into
+      a course they have already planned.
+    cues:
+      - "which program"
+      - "not sure (?:what|which)"
+      - "unclear (?:fit|which)"
+      - "doesn'?t (?:really )?fit"
+      - "not (?:a )?(?:good )?fit for (?:my|our|this)"
+      - "go over their head"
+      - "not (?:for|relevant to) my (?:grade|subject|class)"
+      - "might not (?:be )?align"
+      - "target(?:s)? kids? .{0,15}well"
+      - "depends on (?:your|the) class"
+      - "what does it mean exactly"
+      - "not (?:super )?clear what"
+      - "questions (?:come|would come) to mind"
+      - "which (?:program|one) would be the most fit"
+      - "what (?:program|it) looks? like"
+      - "relevant to them"
+      - "outside (?:of )?(?:careers|business)"
+      - "majority of teachers .{0,25}(?:not|might not)"
+      - "grade (?:3|4|5|6|7|8|9|10|11|12) .{0,20}(?:might|maybe|not sure)"
+      - "wouldn'?t (?:be )?(?:a )?fit"
+      - "only for (?:ppl|people|students) who"
+      # Integration proper: the program may be a fine idea and still have
+      # nowhere to go in a course that is already planned.
+      - "integrat"
+      - "work (?:it )?into (?:my|our|the) (?:course|unit|class|curriculum)"
+      - "where (?:it|this|that) (?:would )?fits?"
+      - "build (?:it )?into"
+      - "already (?:have|planned) (?:my|our|the) (?:course|unit|year)"
+
+  - key: discovery_registration
+    code: B3
+    rank: 3
+    label: "Program discovery and registration friction"
+    frequency: 8
+    applies_to: "Primarily JABC"
+    summary: >-
+      Login loops, scattered materials, unclear portal access, difficulty
+      locating resources and an unobvious path from "interested" to "registered"
+      weaken an otherwise positive offer.
+    cues:
+      - "\\bportal\\b"
+      - "log ?in"
+      - "password"
+      - "website"
+      - "navigat"
+      - "get(?:s)? into a loop"
+      - "hard to find"
+      - "difficult to find"
+      - "confusing"
+      - "disjointed"
+      - "finding the information"
+      - "no clear login"
+      # Registration proper: the step after finding it.
+      - "register"
+      - "registration"
+      - "sign(?:ing)? up"
+      - "how (?:do|would) i (?:sign up|get started|book)"
+      - "request (?:a )?(?:program|session|speaker)"
+      - "\\bform\\b"
+
+  - key: low_awareness
+    code: B4
+    rank: 4
+    label: "Low awareness of JABC programs"
+    frequency: 7
+    applies_to: "Primarily JABC"
+    summary: >-
+      Several educators had limited awareness, believed JA was no longer active
+      or said colleagues did not know the programs existed.
+    cues:
+      - "never heard"
+      - "not at all familiar"
+      - "didn'?t know (?:it|they|about)"
+      - "wasn'?t a thing anymore"
+      - "isn'?t a thing anymore"
+      - "no longer (?:active|around)"
+      - "more information for educators"
+      - "colleagues (?:don'?t|didn'?t) know"
+      - "awareness is first"
+      - "hadn'?t really considered"
+
+  - key: information_overload
+    code: B5
+    rank: 5
+    label: "Information overload and competing priorities"
+    frequency: 6
+    applies_to: "Primarily JABC"
+    summary: >-
+      Materials that are dense, long or dated take more attention than an
+      already-oversubscribed teacher has to give, and compete with everything
+      else asking for the same attention.
+    cues:
+      - "outdated"
+      - "out of date"
+      - "cheesy"
+      - "very dense"
+      - "dense and long"
+      - "lots of reading"
+      - "overwhelming"
+      - "overwhelmed"
+      - "too long"
+      - "\\bboring\\b"
+      - "cultural(?:ly)? relevan"
+      - "all documents .{0,25}look the same"
+      - "not (?:super )?intuitive"
+      # Competing priorities: the same attention, claimed by something else.
+      - "competing (?:priorit|demand)"
+      - "so much (?:going on|on (?:my|our) plate)"
+      - "too many (?:things|programs|emails|options)"
+      - "information overload"
+      - "one more thing"
+      - "other priorities"
+
+  # --- Coded but not plotted -------------------------------------------------
+  # Still part of the coded analysis and still carried here, so the evidence
+  # workbook and the ranked tables stay complete -- it is simply not one of the
+  # five barriers the current circumplex shows. Its code sits after the plotted
+  # five, which is why the codes are no longer strictly frequency-ordered: the
+  # chart's own numbering (B1-B5, no gaps) takes precedence, since a reader
+  # seeing "B1, B2, B3, B6, B7" on five circles reasonably concludes two are
+  # missing.
+  - key: presenter_quality_risk
+    code: B6
+    rank: 6
+    label: "Presenter or delivery quality risk"
+    frequency: 8
+    applies_to: "Both"
+    summary: >-
+      Educators are cautious about giving up classroom time without confidence
+      that the presenter will engage and manage students effectively.
+    cues:
+      - "horrible speaker"
+      - "lower quality"
+      - "low quality"
+      - "quality (?:of the )?(?:presenter|speaker|delivery)"
+      - "who(?:'s| is) coming in"
+      - "taking a risk"
+      - "bigger risk"
+      - "without knowing what the quality"
+      - "too serious for"
+      - "know how to teach"
+      - "nervous about who"
+      - "manage students"

@@ -1,0 +1,32 @@
+respondent_id,original_persona_sheet_label,predicted_brand_persona,classification_match,confidence,classification_confidence,engagement_gate_satisfied,manual_review_flag
+Alison_Bain,Teacher Template,Potential Adopters,,0.341,0.726,True,False
+Alvina_Last,Teacher Template,Potential Adopters,,0.348,0.846,True,False
+Amanda_Reid,Teacher Template,Potential Adopters,,0.344,0.764,True,False
+Amy_Fehst,Teacher Template,Established Supporters,,0.489,0.66,True,False
+Andrea_Nasiopoulos,Teacher Template,Potential Adopters,,0.332,0.847,True,False
+Ashley_Warawa,Teacher Template,Established Supporters,,0.41,0.647,True,False
+Breton_Coons,Teacher Template,Established Supporters,,0.436,0.661,True,False
+Cole_Auringer,Teacher Template,Established Supporters,,0.351,0.677,True,False
+David_Welch,Teacher Template,Established Supporters,,0.525,0.805,True,False
+David_Scott,Teacher Template,Potential Adopters,,0.365,0.835,True,False
+Erin_Paul,Teacher Template,Established Supporters,,0.391,0.816,True,False
+Felix_Nelson,Teacher Template,Potential Adopters,,0.313,0.764,True,False
+Heather_Briske,Teacher Template,Established Supporters,,0.393,0.655,True,False
+Joshua_Jason,Teacher Template,Potential Adopters,,0.301,0.755,True,False
+Karina_Thygesen,Teacher Template,Established Supporters,,0.408,0.655,True,False
+Kimberly_Hlina,Teacher Template,Established Supporters,,0.354,0.637,True,False
+Lesley_Whiteside,Teacher Template,Established Supporters,,0.49,0.825,True,False
+Lori_Christensen,Teacher Template,Potential Adopters,,0.348,0.833,True,False
+Lukas_Yan,Teacher Template,Established Supporters,,0.366,0.612,True,False
+Madeline_Deis,Teacher Template,Potential Adopters,,0.314,0.834,True,False
+Man_Leung,Teacher Template,Potential Adopters,,0.541,0.807,True,False
+Marci_Goldman,Teacher Template,Established Supporters,,0.463,0.841,True,False
+Nicholas_Fitzgerald,Teacher Template,Potential Adopters,,0.403,0.739,True,False
+Rachel_Tremblay-Cote,Teacher Template,Established Supporters,,0.341,0.653,True,False
+Rory_Payment,Teacher Template,Potential Adopters,,0.352,0.819,True,False
+Sarah_Williams,Teacher Template,Established Supporters,,0.428,0.662,True,False
+Shannon_Soper,Teacher Template,Established Supporters,,0.375,0.652,True,False
+Soraya_Rajan,Teacher Template,Potential Adopters,,0.382,0.822,True,False
+Viveka_Johnson__P1_-_Teacher-Active,P1 - Teacher-Active,Established Supporters,True,0.372,0.762,True,True
+Viveka_Johnson__P7_-_Superintendent-FamUnfam-No,P7 - Superintendent-FamUnfam-No,Potential Adopters,True,0.462,0.803,True,True
+Zain_Rehmtulla,Teacher Template,Established Supporters,,0.419,0.664,True,False

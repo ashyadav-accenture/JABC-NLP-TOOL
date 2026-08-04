@@ -1,0 +1,14 @@
+# sentiment_weights.yaml
+# How much VADER sentiment is allowed to influence each theme's Sentiment Support
+# component (section 30.4). Sentiment must never drive Awareness/Understanding or
+# persona classification directly -- it is a supporting signal only, and its
+# per-theme relevance weight is applied *inside* the already-small 10% sentiment
+# component of the theme scoring formula, not on top of it.
+
+sentiment_theme_relevance:
+  awareness: 0.00
+  understanding: 0.05
+  trust: 0.20
+  relevance: 0.10
+  ease_of_engagement: 0.10
+  advocacy: 0.15

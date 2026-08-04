@@ -1,0 +1,331 @@
+# engagement_rules.yaml
+#
+# Drives jabc/engagement.py -- the Engagement / Relationship State detector that
+# now sits *upstream* of persona classification.
+#
+# Why this file exists
+# --------------------
+# The four Brand Personas are defined by an educator's RELATIONSHIP WITH JABC and
+# their disposition toward external classroom programming -- not by how high their
+# perception scores happen to average out:
+#
+#   Brand Champion       currently runs JABC, positive, would run it again
+#   Non-Active Supporter ran JABC before, participation has since stopped/declined
+#   Brand Prospect       no JABC history, but actively runs/explores OTHER external
+#                        programs and is positive about bringing them in
+#   Brand Newbie         no JABC history AND either no external-program experience
+#                        or bad/fearful experience with the ones they tried
+#
+# So the classifier needs three structured facts before it looks at any theme
+# score: (1) does this person have JABC history, (2) is that history current or
+# lapsed, (3) if there is no JABC history, how do they feel about external
+# programming in general. This file supplies the cues used to establish them.
+
+# ---------------------------------------------------------------------------
+# Interview-section geometry
+# ---------------------------------------------------------------------------
+# Which section an answer sits in is the single most reliable engagement signal
+# available: the interview guide routes respondents into sections by persona, so
+# a substantively-answered Section F ("LAPSED ENGAGEMENT") is direct evidence of
+# lapse regardless of what words the answer happens to use.
+#
+# Section letters are recovered from the question number: a letter prefix
+# ("E1", "F2" -- used by the synthetic fixtures) or the leading integer of a
+# numeric outline number ("5.1" -> section E, "6.2" -> section F), which is how
+# the live JABC workbooks are numbered.
+sections:
+  A: educator_context
+  B: external_programming_experience
+  C: jabc_familiarity
+  D: decision_making
+  E: jabc_experience
+  F: lapsed_engagement
+  G: never_ran_external
+  H: district_lens
+  I: communication_future
+  J: additional
+
+# Fallback when the question number carries no usable section, matched as a
+# case-insensitive substring against question_category + question_text.
+section_category_fallback:
+  - {match: "lapsed", section: F}
+  - {match: "never ran", section: G}
+  - {match: "jabc experience", section: E}
+  - {match: "superintendent", section: H}
+  - {match: "district lens", section: H}
+  - {match: "educator context", section: A}
+  - {match: "future opportunities", section: I}
+
+# Sections whose answers are treated as JABC-relationship context. Recency and
+# lapse cues are only counted here (or in any answer that names JABC directly),
+# so "last year we did a leadership program" about a NON-JABC provider cannot be
+# misread as current JABC engagement.
+jabc_context_sections: [C, E, F]
+
+# Sections whose answers describe experience with external programming in
+# general. Used for the Prospect-vs-Newbie split. Answers that name JABC are
+# excluded from this pool at runtime -- JABC's own programs say nothing about how
+# the educator feels about *other* providers.
+external_context_sections: [B, D, G]
+
+# Sections that only exist for respondents with JABC history / lapse.
+jabc_experience_sections: [E]
+lapsed_engagement_sections: [F]
+never_ran_external_sections: [G]
+
+# ---------------------------------------------------------------------------
+# Anchor questions
+# ---------------------------------------------------------------------------
+# A stray answer somewhere in Section E is NOT proof of JABC history. Several
+# respondents who had never heard of JABC still have content against Q5.1-5.3,
+# because the interviewer used those prompts prospectively -- "just apply
+# online", "texting would be better than email" are answers about how the
+# person *would* want it to work, not reports of something that happened.
+#
+# Only the section's anchor question ("walk me through your most recent
+# experience with a JABC program") is retrospective enough to establish history
+# on its own. The remaining Section E rows still corroborate, but cannot
+# establish.
+jabc_experience_anchor:
+  question_numbers: ["5", "5.4", "E1"]
+  question_text_any:
+    - "most recent experience with a jabc"
+    - "walk me through your most recent"
+    - "recent jabc experience"
+    - "describe your recent jabc experience"
+    # The Active-branch retention question. Answering "what kept you coming
+    # back" retrospectively is as direct a statement of ongoing participation
+    # as the walkthrough question.
+    - "what kept you coming back"
+
+# Beyond the anchors, a Section E answer that NAMES JABC is also establishing:
+# describing JABC's own educator portal or program manager is a report of
+# having used them. The JABC mention is what does the work -- it is exactly
+# what the prospective, hypothetical answers in that section lack.
+jabc_experience_from_named_section_e: true
+
+# The familiarity question. Its answer is authoritative on prior awareness and
+# acts as a hard override: someone who says they were not at all familiar with
+# JABC before the interview cannot also have JABC participation history, no
+# matter what else the sheet contains.
+jabc_familiarity_question:
+  question_numbers: ["3", "C1"]
+  question_text_any:
+    - "how familiar were you with jabc"
+    - "how familiar are you with jabc"
+    - "familiar with jabc before"
+    - "before today, how familiar"
+
+# Answers to the familiarity question that deny any prior awareness. Matched
+# against the whole answer after trimming; a bare "1" on the 1-5 familiarity
+# scale counts too and is handled in code.
+familiarity_denial:
+  - "^nothing\\b"
+  - "^none\\b"
+  - "^no\\b"
+  - "^n/?a$"
+  - "not at all"
+  - "never heard"
+  - "not familiar"
+  - "hadn'?t heard"
+  - "zero"
+  - "unfamiliar"
+
+# ---------------------------------------------------------------------------
+# Cue lexicons
+# ---------------------------------------------------------------------------
+# All entries are matched case-insensitively as regular expressions against the
+# cleaned answer text. Keep them phrase-level: single common words produce far
+# too many false positives in conversational interview transcripts.
+cues:
+  # Does this answer name JABC at all?
+  jabc_mention:
+    - "jabc"
+    - "ja bc"
+    - "junior achievement"
+    - "\\bja\\b"
+
+  # Evidence that the JABC relationship is live right now.
+  jabc_current:
+    - "this year"
+    - "this past year"
+    - "this school year"
+    - "last year"
+    - "currently"
+    - "right now"
+    - "these days"
+    - "every year"
+    - "each year"
+    - "annually"
+    - "we (?:still )?(?:run|use|do)\\b"
+    - "i (?:still )?(?:run|use|do)\\b"
+    - "keep(?:s)? coming back"
+    - "came back"
+    - "most recent"
+    - "recently"
+    - "\\b20(?:2[4-9]|3\\d)\\b"
+
+  # Evidence that the JABC relationship has stopped or wound down.
+  jabc_lapsed:
+    - "years ago"
+    - "\\b(?:a )?(?:long|while) (?:time )?ago"
+    - "back then"
+    - "used to"
+    - "no longer"
+    - "not anymore"
+    - "isn'?t a thing anymore"
+    - "wasn'?t a thing anymore"
+    - "stopped"
+    - "stopped using"
+    - "haven'?t (?:done|run|used)"
+    - "hadn'?t really considered"
+    - "since then"
+    - "last time (?:i|we) ran"
+    - "fell off"
+    - "dropped off"
+    - "took a break"
+    - "we don'?t (?:run|use|do) (?:it|that|them) anymore"
+
+  # Willingness to keep going / advocate -- separates a Champion from a merely
+  # currently-engaged respondent, and marks a winnable Non-Active Supporter.
+  jabc_intent_continue:
+    - "would recommend"
+    - "highly recommend"
+    - "definitely recommend"
+    - "def recommend"
+    - "recommend it"
+    - "would champion"
+    - "champion it"
+    - "do it again"
+    - "run it again"
+    - "running it again"
+    - "would do (?:it|this) again"
+    - "keep (?:doing|running|using)"
+    - "come back"
+    - "continue"
+    - "sign up again"
+    - "look forward"
+
+  # Disposition toward EXTERNAL programming (non-JABC). Positive: this educator
+  # already invites outside programs in and is glad they did -- a Prospect.
+  external_positive:
+    - "easy to follow"
+    - "easy to (?:use|download|access|find)"
+    - "pretty easy"
+    - "really (?:good|great|cool|nice)"
+    - "went (?:really )?well"
+    - "worked (?:really )?well"
+    - "great experience"
+    - "cool experience"
+    - "loved"
+    - "love (?:when|it|having)"
+    - "students (?:were|are) engaged"
+    - "so engaging"
+    - "very engaging"
+    - "super engaging"
+    - "would (?:definitely )?do (?:it|that) again"
+    - "valuable"
+    - "worth it"
+    - "open to"
+    - "happy to"
+    - "keen"
+    - "excited"
+    - "interested in (?:trying|exploring|bringing)"
+    - "we (?:run|use|do|have) (?:a lot of|lots of|several|many)"
+
+  # Negative: tried outside programming and it did not stick / did not fit.
+  external_negative:
+    - "only worked out once"
+    - "nothing (?:has )?(?:really )?stuck"
+    - "hasn'?t (?:really )?stuck"
+    - "didn'?t (?:go|work) well"
+    - "did not (?:go|work) well"
+    - "waste of time"
+    - "wasted"
+    - "poor quality"
+    - "low(?:er)? quality"
+    - "horrible"
+    - "terrible"
+    - "disappointing"
+    - "didn'?t choose"
+    - "did not choose"
+    - "controversial"
+    - "never (?:really )?(?:found|come across) (?:one|a program)"
+    - "not (?:a )?(?:good|great) fit"
+    - "fell flat"
+    - "didn'?t (?:really )?work for"
+
+  # Hesitancy / risk aversion about letting anything external into the room.
+  # The Brand Newbie profile calls this out explicitly ("fear of trying external
+  # programs"), so it is tracked separately from plain negative experience.
+  external_hesitancy:
+    - "\\bfear\\b"
+    - "afraid"
+    - "scared"
+    - "nervous"
+    - "\\brisk\\b"
+    - "risky"
+    - "bigger risk"
+    - "hesitant"
+    - "hesitation"
+    - "reluctant"
+    - "wary"
+    - "worth the trouble"
+    - "hard to assess"
+    - "without knowing"
+    - "take a chance"
+    - "gamble"
+    - "not sure it'?s worth"
+    - "big commitment"
+    - "a lot of (?:classroom )?time to give up"
+
+  # Explicit statements of never having run anything external. Kept narrow --
+  # a loose pattern like "doesn't do that" fires on any passing remark about a
+  # single course and would wrongly strip a Prospect of their external history.
+  external_none:
+    - "never (?:run|ran|done|tried) (?:an?|any|one)"
+    - "haven'?t (?:ever )?(?:run|ran|done|tried) (?:an?|any|one)"
+    - "have not (?:ever )?(?:run|ran|done|tried) (?:an?|any|one)"
+    - "don'?t (?:run|use|do) any (?:external|outside)"
+    - "off the table"
+    - "no experience (?:with|running)"
+
+  # Awareness of JABC, used only as a soft tie-break.
+  jabc_unaware:
+    - "never heard"
+    - "not at all familiar"
+    - "not at all"
+    - "not familiar"
+    - "hadn'?t heard"
+    - "no idea what"
+    - "don'?t know (?:what|anything) (?:it|jabc|they)"
+
+# ---------------------------------------------------------------------------
+# Thresholds
+# ---------------------------------------------------------------------------
+thresholds:
+  # An answer shorter than this is treated as a checkbox/stub rather than a
+  # substantive response, so it cannot on its own establish section evidence.
+  min_substantive_answer_chars: 20
+
+  # External-programming disposition is a continuous score in [-1, 1] blending
+  # cue counts with VADER sentiment over the external-context answers. At or
+  # above this, an educator with no JABC history reads as a Brand Prospect;
+  # below it, as a Brand Newbie.
+  external_disposition_threshold: 0.0
+
+  # How much of the disposition score comes from explicit cue matches vs. the
+  # sentiment of the same answers. Cues are weighted higher because they are
+  # specific to the programming question; VADER is a general-purpose signal.
+  disposition_cue_weight: 0.65
+  disposition_sentiment_weight: 0.35
+
+  # Cue counts are squashed with tanh(n / this) so a single vivid answer cannot
+  # saturate the score.
+  cue_saturation: 2.0
+
+  # A JABC-experienced respondent with no recency cues either way is treated as
+  # current (they answered the "most recent experience" section and were never
+  # routed into the lapsed section). Lapse must beat current by this margin to
+  # flip them to Non-Active Supporter.
+  lapse_over_current_margin: 0.5

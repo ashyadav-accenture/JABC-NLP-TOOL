@@ -1,0 +1,40 @@
+# scoring_weights.yaml
+# Weights for the deterministic theme scoring formula (section 30):
+#   final_score = sum(component_score * weight) / sum(weight for available components)
+# so that components with no evidence do not drag the score down.
+
+theme_scoring_weights:
+  contextual_evidence: 0.40
+  phrase_rule_evidence: 0.25
+  explicit_rating: 0.15
+  sentiment_support: 0.10
+  behavioral_evidence: 0.10
+
+# Overall confidence: how much evidence stands behind this respondent's whole
+# profile (theme scores included). Reported on every output row.
+confidence_weights:
+  evidence_coverage: 0.30
+  evidence_strength: 0.25
+  persona_margin: 0.20
+  answer_completeness: 0.15
+  classification_consistency: 0.10
+
+# Classification confidence: how sure we are of the PERSONA specifically. Kept
+# separate from overall confidence because the two answer different questions.
+# A Brand Newbie interview is thin by definition -- there is little to say about
+# a program you have never run -- so its theme evidence is sparse and overall
+# confidence is low, yet the persona itself is unambiguous the moment the
+# engagement gate fires. Routing persona manual-review off overall confidence
+# therefore flagged every respondent and told reviewers nothing.
+classification_confidence_weights:
+  engagement_gate: 0.45
+  persona_margin: 0.35
+  classification_consistency: 0.20
+
+evidence_status_thresholds:
+  # evidence_strength thresholds used to assign evidence_status per theme
+  supported_min_coverage: 0.60
+  supported_min_strength: 0.55
+  weak_max_strength: 0.30
+  mixed_conflict_ratio: 0.35   # if positive/negative evidence are both present in
+                               # roughly this ratio, status = "mixed"
