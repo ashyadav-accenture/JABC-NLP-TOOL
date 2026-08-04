@@ -552,11 +552,4 @@ config/                          # all tunable YAML configuration (9 files)
 sample_data/                     # synthetic demo workbooks + generator script
 tests/                           # pytest suite (70 tests)
 outputs/                         # default --output_dir; checked-in example run
-AI_Sentiment_Circumplex_Implementation.md   # design note only -- see below
 ```
-
-`AI_Sentiment_Circumplex_Implementation.md` is a **proposal, not a description
-of this code**. It sketches a different chart — one that plots respondents by
-their overall disposition, where the implemented `factor_circumplex.png` plots
-motivators and barriers. Nothing in `jabc/` builds it; read it as a design
-option that was written up and not taken.
